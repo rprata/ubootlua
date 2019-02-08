@@ -1,10 +1,12 @@
-#include <stddef.h>
+#include <types.h>
+#include <irqflags.h>
 
-/* https://codereview.stackexchange.com/questions/105114/re-implementing-memcpy */
-
-void * memcpy(void * dst, const void * src, size_t n)
+void * memcpy(void * dest, const void * src, size_t len)
 {
-    void * ret = dst;
-    asm volatile("rep movsb" : "+D" (dst) : "c"(n), "S"(src) : "cc", "memory");
-    return ret;
+	char * tmp = dest;
+	const char * s = src;
+
+	while (len--)
+		*tmp++ = *s++;
+	return dest;
 }

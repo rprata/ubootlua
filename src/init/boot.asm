@@ -12,7 +12,7 @@ boot:
 	mov [disk],dl
 
 	mov ah, 0x2    			;read sectors
-	mov al, 6      			;sectors to read
+	mov al, 20     			;sectors to read
 	mov ch, 0      			;cylinder idx
 	mov dh, 0      			;head idx
 	mov cl, 2      			;sector idx
@@ -80,8 +80,8 @@ boot32:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax	
-	mov esi, msg            ; SI now points to our message
-	mov ebx, 0xb8000		; vga memory position (0) 
+	;mov esi, msg            ; SI now points to our message
+	;mov ebx, 0xb8000		; vga memory position (0) 
 
 .loop	lodsb               ; Loads SI into AL and increments SI [next char]
 	or al, al               ; Checks if the end of the string
@@ -93,9 +93,9 @@ boot32:
 	jmp .loop               ; Next iteration of the loop
 
 halt: 	
-	mov esp,kernel_stack_top
-	extern init_lua_script
-	call init_lua_script
+	mov esp, kernel_stack_top
+	extern __start
+	call __start
 	cli
 	hlt                     ; CPU command to halt the execution
 
