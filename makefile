@@ -1,13 +1,15 @@
 NASM:=nasm
 CC:=gcc
-SRC_NASM:=./src/boot/boot.asm
-SRC_C:=./src/boot/boot.c
-LINKER:=./src/boot/linker.ld
+SRC_NASM:=./src/core/boot.asm
+SRC_C:=./src/core/boot.c
+LINKER:=./src/core/linker.ld
 DEPLOY=./deploy
 BUILD:=./build
 BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
 CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -Wall -Wextra -Werror
+
+
 all:
 	mkdir -p $(DEPLOY)
 	mkdir -p $(BUILD)
