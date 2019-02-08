@@ -7,7 +7,7 @@ DEPLOY=./deploy
 BUILD:=./build
 BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
-CFLAGS:=-m32 -nostdlib -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -Wall -Wextra -Werror
+CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -Wall -Wextra -Werror
 all:
 	mkdir -p $(DEPLOY)
 	mkdir -p $(BUILD)

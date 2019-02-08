@@ -1,5 +1,5 @@
 
-int kmain() {
+int init_lua_script() {
     short color = 0x0200;
     const char *msg = "Hello world! C example\0";
     short* vga = (short*)0xb8000;

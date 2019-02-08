@@ -94,8 +94,8 @@ boot32:
 
 halt: 	
 	mov esp,kernel_stack_top
-	extern kmain
-	call kmain
+	extern init_lua_script
+	call init_lua_script
 	cli
 	hlt                     ; CPU command to halt the execution
 
