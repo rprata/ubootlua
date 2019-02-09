@@ -8,14 +8,14 @@ BUILD:=./build
 BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
 CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include 
-
+LDFLAGS:=
 export ARCH:=i386
 
 all: zlib
 	mkdir -p $(DEPLOY)
 	mkdir -p $(BUILD)
 	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM) 
-	$(CC) $(SRC_C) $(OBJ_NASM) $(OBJ_LIBC) $(OBJ_ARCH) -o $(BIN) $(CFLAGS) -T $(LINKER)
+	$(CC) $(SRC_C) $(OBJ_NASM) -o $(BIN) $(CFLAGS) -T $(LINKER) $(LDFLAGS)
 run:
 	qemu-system-i386 -fda $(BIN)
 
@@ -39,6 +39,8 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
 OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC)
+LIB_LIBC:=./build/lib/libc/libc.a
+LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
@@ -53,11 +55,11 @@ build/lib/libc/exit/%.o: src/lib/libc/exit/%.c
 libc_clean:
 	rm -rf build/lib/libc
 
-libc: arch $(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC)
-
+libc: arch $(OBJ_LIBC)
+	ar rcs $(LIB_LIBC) $(OBJ_LIBC) $(OBJ_ARCH)
 
 #########################
-######### arch ##########
+######### arch ###### ###
 #########################
 
 BUILD_ARCH:=./build/arch
@@ -107,7 +109,9 @@ OBJ_ZLIB:=$(BUILD_ZLIB)/adler32.o \
 		  $(BUILD_ZLIB)/uncompr.o \
 		  $(BUILD_ZLIB)/zutil.o
 
+LIB_ZLIB:=./build/external/zlib/libz.a
 CFLAGS+=-I./src/external/zlib
+LDFLAGS+=-L./build/external/zlib -lz
 
 build/external/zlib/%.o: src/external/zlib/%.c
 	mkdir -p build/external/zlib 
@@ -117,7 +121,7 @@ zlib_clean:
 	rm -rf build/external/zlib
 
 zlib: libc $(OBJ_ZLIB) 
-	# $(CC) -o $@ $(SRC_ZLIB) $(LDFLAGS)
+	ar rcs $(LIB_ZLIB) $(OBJ_ZLIB)
 
 clean: arch_clean zlib_clean
 	rm -rf deploy
