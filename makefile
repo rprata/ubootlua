@@ -25,6 +25,34 @@ run:
 #########################
 
 #########################
+######## stdlib #########
+#########################
+BUILD_LIBC_STDLIB:=./build/lib/libc/stdlib
+OBJ_LIBC_STDLIB:=$(BUILD_LIBC_STDLIB)/abs.o \
+				 $(BUILD_LIBC_STDLIB)/atoi.o \
+				 $(BUILD_LIBC_STDLIB)/atoll.o \
+				 $(BUILD_LIBC_STDLIB)/div.o \
+				 $(BUILD_LIBC_STDLIB)/ldiv.o \
+				 $(BUILD_LIBC_STDLIB)/lldiv.o \
+				 $(BUILD_LIBC_STDLIB)/strntoumax.o \
+ 				 $(BUILD_LIBC_STDLIB)/strtoimax.o \
+				 $(BUILD_LIBC_STDLIB)/strtoll.o \
+				 $(BUILD_LIBC_STDLIB)/strtoull.o \
+				 $(BUILD_LIBC_STDLIB)/atof.o \
+				 $(BUILD_LIBC_STDLIB)/atol.o \
+				 $(BUILD_LIBC_STDLIB)/bsearch.o \
+				 $(BUILD_LIBC_STDLIB)/labs.o \
+				 $(BUILD_LIBC_STDLIB)/llabs.o \
+				 $(BUILD_LIBC_STDLIB)/qsort.o \
+				 $(BUILD_LIBC_STDLIB)/strntoimax.o \
+				 $(BUILD_LIBC_STDLIB)/strtod.o \
+				 $(BUILD_LIBC_STDLIB)/strtol.o \
+				 $(BUILD_LIBC_STDLIB)/strtoul.o \
+				 $(BUILD_LIBC_STDLIB)/strtoumax.o
+				 # Its necessary to implement clock driver
+ 				 #$(BUILD_LIBC_STDLIB)/rand.o 
+
+#########################
 ######## malloc #########
 #########################
 BUILD_LIBC_MALLOC:=./build/lib/libc/malloc
@@ -38,12 +66,17 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
+
+build/lib/libc/stdlib/%.o: src/lib/libc/stdlib/%.c
+	mkdir -p build/lib/libc/stdlib 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
 build/lib/libc/malloc/%.o: src/lib/libc/malloc/%.c
 	mkdir -p build/lib/libc/malloc 
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -97,17 +130,19 @@ OBJ_ZLIB:=$(BUILD_ZLIB)/adler32.o \
 		  $(BUILD_ZLIB)/compress.o \
 		  $(BUILD_ZLIB)/crc32.o \
 		  $(BUILD_ZLIB)/deflate.o \
-		  $(BUILD_ZLIB)/gzclose.o \
-		  $(BUILD_ZLIB)/gzlib.o \
-		  $(BUILD_ZLIB)/gzread.o \
-		  $(BUILD_ZLIB)/gzwrite.o \
 		  $(BUILD_ZLIB)/infback.o \
 		  $(BUILD_ZLIB)/inffast.o \
 		  $(BUILD_ZLIB)/inflate.o \
 		  $(BUILD_ZLIB)/inftrees.o \
 		  $(BUILD_ZLIB)/trees.o \
 		  $(BUILD_ZLIB)/uncompr.o \
-		  $(BUILD_ZLIB)/zutil.o
+		  $(BUILD_ZLIB)/zutil.o 
+
+		  # it's necessary to implement close(), open(), read(), write() and lseek()
+		  #$(BUILD_ZLIB)/gzclose.o 
+		  #$(BUILD_ZLIB)/gzlib.o \
+		  #$(BUILD_ZLIB)/gzread.o \
+		  #$(BUILD_ZLIB)/gzwrite.o 
 
 LIB_ZLIB:=./build/external/zlib/libz.a
 CFLAGS+=-I./src/external/zlib

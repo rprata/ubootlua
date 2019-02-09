@@ -273,7 +273,7 @@ local unsigned long crc32_little(crc, buf, len)
 
     c = (z_crc_t)crc;
     c = ~c;
-    while (len && ((ptrdiff_t)buf & 3)) {
+    while (len && ((ptrdiff_t)(int)buf & 3)) {
         c = crc_table[0][(c ^ *buf++) & 0xff] ^ (c >> 8);
         len--;
     }
@@ -313,7 +313,7 @@ local unsigned long crc32_big(crc, buf, len)
 
     c = ZSWAP32((z_crc_t)crc);
     c = ~c;
-    while (len && ((ptrdiff_t)buf & 3)) {
+    while (len && ((ptrdiff_t)(int)buf & 3)) {
         c = crc_table[4][(c >> 24) ^ *buf++] ^ (c << 8);
         len--;
     }

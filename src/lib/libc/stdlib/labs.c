@@ -1,0 +1,6 @@
+#include <stdlib.h>
+
+long labs(long n)
+{
+	return ((n < 0L) ? -n : n);
+}
