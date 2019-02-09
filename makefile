@@ -96,6 +96,10 @@ OBJ_ZLIB:=$(BUILD_ZLIB)/adler32.o \
 		  $(BUILD_ZLIB)/crc32.o \
 		  $(BUILD_ZLIB)/deflate.o \
 		  $(BUILD_ZLIB)/gzclose.o \
+		  $(BUILD_ZLIB)/gzlib.o \
+		  $(BUILD_ZLIB)/gzread.o \
+		  $(BUILD_ZLIB)/gzwrite.o \
+		  $(BUILD_ZLIB)/infback.o \
 		  $(BUILD_ZLIB)/inffast.o \
 		  $(BUILD_ZLIB)/inflate.o \
 		  $(BUILD_ZLIB)/inftrees.o \
@@ -103,14 +107,7 @@ OBJ_ZLIB:=$(BUILD_ZLIB)/adler32.o \
 		  $(BUILD_ZLIB)/uncompr.o \
 		  $(BUILD_ZLIB)/zutil.o
 
-		  # $(BUILD_ZLIB)/gzclose.o \
-		  # $(BUILD_ZLIB)/gzlib.o \
-		  # $(BUILD_ZLIB)/gzread.o \
-		  # $(BUILD_ZLIB)/gzwrite.o \
-		  # $(BUILD_ZLIB)/infback.o \
-
-
-CFLAGS+=-I./src/external/zlib/ -DZ_SOLO
+CFLAGS+=-I./src/external/zlib
 
 build/external/zlib/%.o: src/external/zlib/%.c
 	mkdir -p build/external/zlib 

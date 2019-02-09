@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+#include <types.h>
+
 #if defined(__cplusplus)
 #define NULL		(0)
 #else
