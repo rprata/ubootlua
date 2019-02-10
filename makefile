@@ -26,7 +26,18 @@ run:
 
 
 #########################
-######## charset #########
+######## crypto #########
+#########################
+BUILD_LIBC_CRYPTO:=./build/lib/libc/crypto
+OBJ_LIBC_CRYPTO:=$(BUILD_LIBC_CRYPTO)/aes128.o \
+				 $(BUILD_LIBC_CRYPTO)/crc16.o \
+				 $(BUILD_LIBC_CRYPTO)/crc32.o \
+				 $(BUILD_LIBC_CRYPTO)/crc8.o \
+				 $(BUILD_LIBC_CRYPTO)/sha1.o \
+				 $(BUILD_LIBC_CRYPTO)/sha256.o
+
+#########################
+######## charset ########
 #########################
 BUILD_LIBC_CHARSET:=./build/lib/libc/charset
 OBJ_LIBC_CHARSET:=$(BUILD_LIBC_CHARSET)/charset.o
@@ -73,13 +84,16 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
 
+build/lib/libc/crypto/%.o: src/lib/libc/crypto/%.c
+	mkdir -p build/lib/libc/crypto 
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/charset/%.o: src/lib/libc/charset/%.c
 	mkdir -p build/lib/libc/charset 
