@@ -11,12 +11,12 @@ int __start() {
     short * vga = (short*)0xb8000;
     unsigned i = 0;
 	char *buf;
-	buf = (char *)malloc(23);
+	buf = (char *)malloc(500);
 	memcpy(buf, msg,23);    
 
 	// memset(buf, 100, 23);
 	for (i = 0; i < 23; ++i) {
-        vga[i] = color | msg[i];
+        vga[i] = color | buf[i];
     }
 
     return 0;

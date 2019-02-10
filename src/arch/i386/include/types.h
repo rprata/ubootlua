@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+typedef signed char				s8_t;
 typedef unsigned char			u8_t;
 
 typedef signed short			s16_t;
@@ -30,16 +31,12 @@ typedef signed long				off_t;
 typedef signed long long		loff_t;
 
 typedef signed int				bool_t;
-
-typedef signed long				register_t;
 typedef unsigned long			irq_flags_t;
 
 typedef unsigned long long		virtual_addr_t;
 typedef unsigned long long		virtual_size_t;
 typedef unsigned long long		physical_addr_t;
 typedef unsigned long long		physical_size_t;
-
-
 
 typedef struct {
 	volatile long counter;
