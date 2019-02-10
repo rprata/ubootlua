@@ -21,9 +21,29 @@ run:
 
 
 #########################
-######### lib ###########
+######### libc ##########
 #########################
 
+#########################
+######### ctype #########
+#########################
+BUILD_LIBC_CTYPE:=./build/lib/libc/ctype
+OBJ_LIBC_CTYPE:=$(BUILD_LIBC_CTYPE)/isalnum.o \
+				$(BUILD_LIBC_CTYPE)/isalpha.o \
+				$(BUILD_LIBC_CTYPE)/isascii.o \
+				$(BUILD_LIBC_CTYPE)/isblank.o \
+				$(BUILD_LIBC_CTYPE)/iscntrl.o \
+				$(BUILD_LIBC_CTYPE)/isdigit.o \
+				$(BUILD_LIBC_CTYPE)/isgraph.o \
+				$(BUILD_LIBC_CTYPE)/islower.o \
+				$(BUILD_LIBC_CTYPE)/isprint.o \
+				$(BUILD_LIBC_CTYPE)/ispunct.o \
+				$(BUILD_LIBC_CTYPE)/isspace.o \
+				$(BUILD_LIBC_CTYPE)/isupper.o \
+				$(BUILD_LIBC_CTYPE)/isxdigit.o \
+				$(BUILD_LIBC_CTYPE)/toascii.o \
+				$(BUILD_LIBC_CTYPE)/tolower.o \
+				$(BUILD_LIBC_CTYPE)/toupper.o
 
 #########################
 ######## crypto #########
@@ -84,12 +104,17 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
+
+
+build/lib/libc/ctype/%.o: src/lib/libc/ctype/%.c
+	mkdir -p build/lib/libc/ctype 
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/crypto/%.o: src/lib/libc/crypto/%.c
 	mkdir -p build/lib/libc/crypto 
@@ -125,6 +150,7 @@ BUILD_ARCH:=./build/arch
 OBJ_ARCH:=$(BUILD_ARCH)/memcpy.o \
 		  $(BUILD_ARCH)/memset.o \
 		  $(BUILD_ARCH)/memcmp.o \
+		  $(BUILD_ARCH)/setjmp.o
 
 ifeq ($(ARCH),i386)
 #########################
