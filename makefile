@@ -24,6 +24,13 @@ run:
 ######### lib ###########
 #########################
 
+
+#########################
+######## charset #########
+#########################
+BUILD_LIBC_CHARSET:=./build/lib/libc/charset
+OBJ_LIBC_CHARSET:=$(BUILD_LIBC_CHARSET)/charset.o
+
 #########################
 ######## stdlib #########
 #########################
@@ -66,12 +73,17 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
+
+
+build/lib/libc/charset/%.o: src/lib/libc/charset/%.c
+	mkdir -p build/lib/libc/charset 
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/stdlib/%.o: src/lib/libc/stdlib/%.c
 	mkdir -p build/lib/libc/stdlib 
