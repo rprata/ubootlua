@@ -25,6 +25,12 @@ run:
 #########################
 
 
+#########################
+######### errno #########
+#########################
+BUILD_LIBC_ERRNO:=./build/lib/libc/errno
+OBJ_LIBC_ERRNO:=$(BUILD_LIBC_ERRNO)/strerror.o \
+				 $(BUILD_LIBC_ERRNO)/errno.o
 
 #########################
 ######## string #########
@@ -136,13 +142,16 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
 
+build/lib/libc/errno/%.o: src/lib/libc/errno/%.c
+	mkdir -p build/lib/libc/errno 
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/string/%.o: src/lib/libc/string/%.c
 	mkdir -p build/lib/libc/string 
