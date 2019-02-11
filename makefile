@@ -24,6 +24,38 @@ run:
 ######### libc ##########
 #########################
 
+
+
+#########################
+######## string #########
+#########################
+BUILD_LIBC_STRING:=./build/lib/libc/string
+OBJ_LIBC_STRING:=$(BUILD_LIBC_STRING)/memchr.o \
+				 $(BUILD_LIBC_STRING)/strcasecmp.o \
+				 $(BUILD_LIBC_STRING)/strchr.o \
+				 $(BUILD_LIBC_STRING)/strcpy.o \
+				 $(BUILD_LIBC_STRING)/strdup.o \
+				 $(BUILD_LIBC_STRING)/strlcpy.o \
+				 $(BUILD_LIBC_STRING)/strncasecmp.o \
+				 $(BUILD_LIBC_STRING)/strnchr.o \
+				 $(BUILD_LIBC_STRING)/strnicmp.o \
+				 $(BUILD_LIBC_STRING)/strnstr.o \
+				 $(BUILD_LIBC_STRING)/strrchr.o \
+				 $(BUILD_LIBC_STRING)/strspn.o \
+				 $(BUILD_LIBC_STRING)/memscan.o \
+				 $(BUILD_LIBC_STRING)/strcat.o \
+				 $(BUILD_LIBC_STRING)/strcoll.o \
+				 $(BUILD_LIBC_STRING)/strcspn.o \
+				 $(BUILD_LIBC_STRING)/strlcat.o \
+				 $(BUILD_LIBC_STRING)/strlen.o \
+				 $(BUILD_LIBC_STRING)/strncat.o \
+				 $(BUILD_LIBC_STRING)/strncpy.o \
+				 $(BUILD_LIBC_STRING)/strnlen.o \
+				 $(BUILD_LIBC_STRING)/strpbrk.o \
+				 $(BUILD_LIBC_STRING)/strsep.o \
+				 $(BUILD_LIBC_STRING)/strstr.o
+
+
 #########################
 ######### ctype #########
 #########################
@@ -104,13 +136,17 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 endif
 
+
+build/lib/libc/string/%.o: src/lib/libc/string/%.c
+	mkdir -p build/lib/libc/string 
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/ctype/%.o: src/lib/libc/ctype/%.c
 	mkdir -p build/lib/libc/ctype 
@@ -149,7 +185,10 @@ libc: arch $(OBJ_LIBC)
 BUILD_ARCH:=./build/arch
 OBJ_ARCH:=$(BUILD_ARCH)/memcpy.o \
 		  $(BUILD_ARCH)/memset.o \
+		  $(BUILD_ARCH)/memmove.o \
 		  $(BUILD_ARCH)/memcmp.o \
+		  $(BUILD_ARCH)/strcmp.o \
+		  $(BUILD_ARCH)/strncmp.o \
 		  $(BUILD_ARCH)/setjmp.o
 
 ifeq ($(ARCH),i386)
