@@ -10,8 +10,14 @@ OBJ_NASM:=$(BUILD)/boot.o
 CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include 
 LDFLAGS:=
 export ARCH:=i386
+export ZLIB_SUPPORT:=false
 
-all: zlib
+DEPENDENCIES:=libc
+ifeq ($(ZLIB_SUPPORT),true)
+DEPENDENCIES:=$(DEPENDENCIES) zlib
+endif
+
+all: $(DEPENDENCIES)
 	mkdir -p $(DEPLOY)
 	mkdir -p $(BUILD)
 	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM) 
@@ -195,8 +201,8 @@ build/lib/libc/exit/%.o: src/lib/libc/exit/%.c
 libc_clean:
 	rm -rf build/lib/libc
 
-libc: arch $(OBJ_LIBC)
-	ar rcs $(LIB_LIBC) $(OBJ_LIBC) $(OBJ_ARCH)
+libc: arch std $(OBJ_LIBC)
+	ar rcs $(LIB_LIBC) $(OBJ_LIBC) $(OBJ_ARCH) $(OBJ_STD)
 
 #########################
 ######### arch ###### ###
@@ -229,10 +235,29 @@ arch_clean:
 arch: $(OBJ_ARCH)
 endif
 
+
+#########################
+####### lib std #########
+#########################
+BUILD_STD:=./build/lib/std
+OBJ_STD:=$(BUILD_STD)/fifo.o \
+		 $(BUILD_STD)/queue.o \
+		 $(BUILD_STD)/rbtree.o
+
+build/lib/std/%.o: src/lib/std/%.c
+	mkdir -p build/lib/std 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+std_clean:
+	rm -rf build/lib/std
+
+std: $(OBJ_STD)
+
 #########################
 ####### external ########
 #########################
 
+ifeq ($(ZLIB_SUPPORT),true)
 #########################
 ######### zlib ##########
 #########################
@@ -268,8 +293,9 @@ zlib_clean:
 
 zlib: libc $(OBJ_ZLIB) 
 	ar rcs $(LIB_ZLIB) $(OBJ_ZLIB)
+endif 
 
-clean: arch_clean zlib_clean
+clean:
 	rm -rf deploy
 	rm -rf build
 
