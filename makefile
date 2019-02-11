@@ -1,7 +1,7 @@
 NASM:=nasm
 CC:=gcc
 SRC_NASM:=./src/init/boot.asm
-SRC_C:=./src/init/boot.c
+SRC_C:=./src/init/boot.c ./src/init/version.c
 LINKER:=./src/init/linker.ld
 DEPLOY=./deploy
 BUILD:=./build
@@ -129,6 +129,13 @@ OBJ_LIBC_STDLIB:=$(BUILD_LIBC_STDLIB)/abs.o \
  				 #$(BUILD_LIBC_STDLIB)/rand.o 
 
 #########################
+######### stdio #########
+#########################
+BUILD_LIBC_STDIO:=./build/lib/libc/stdio
+OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
+				$(BUILD_LIBC_STDIO)/printf.o
+
+#########################
 ######## malloc #########
 #########################
 BUILD_LIBC_MALLOC:=./build/lib/libc/malloc
@@ -142,7 +149,7 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDIO) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc
 ifeq ($(ARCH),i386)
@@ -167,6 +174,10 @@ build/lib/libc/crypto/%.o: src/lib/libc/crypto/%.c
 
 build/lib/libc/charset/%.o: src/lib/libc/charset/%.c
 	mkdir -p build/lib/libc/charset 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+build/lib/libc/stdio/%.o: src/lib/libc/stdio/%.c
+	mkdir -p build/lib/libc/stdio 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/stdlib/%.o: src/lib/libc/stdlib/%.c

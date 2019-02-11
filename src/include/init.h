@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <version.h>
+
 void do_init_mem_pool(void);
 
 #ifdef __cplusplus
