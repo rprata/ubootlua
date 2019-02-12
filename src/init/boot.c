@@ -8,7 +8,7 @@ int __start() {
     do_init_mem_pool();
     
     short color = 0x0200;
-    const char *msg = "Hello world! C example\t";
+    const char *msg = "Hello world! C example";
     short * vga = (short*)0xb8000;
     unsigned i = 0;
 
@@ -20,6 +20,6 @@ int __start() {
 //https://github.com/tifanny-suyavong/hello64 
 
     serial_init(TTYS0, BPS_115200);
-    serial_print(TTYS0, msg);
+    serial_print(TTYS0, BANNER_VERSION);
     return 0;
 }

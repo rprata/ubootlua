@@ -39,6 +39,9 @@ void serial_print(word port, const char *s) {
     }
 }
 
-char serial_getchar(word port) {
-    
+void serial_println(word port, const char *s) {
+    while (*s) {
+        serial_putchar(port, *(s)++);
+    }
+    serial_putchar(port, '\n');
 }
