@@ -23,7 +23,7 @@ all: $(DEPENDENCIES)
 	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM) 
 	$(CC) $(SRC_C) $(OBJ_NASM) -o $(BIN) $(CFLAGS) -T $(LINKER) $(LDFLAGS)
 run:
-	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none -serial /dev/ttyS0
+	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none
 
 
 
@@ -206,6 +206,7 @@ libc_clean:
 libc: arch std $(OBJ_LIBC)
 	ar rcs $(LIB_LIBC) $(OBJ_LIBC) $(OBJ_ARCH) $(OBJ_STD) \
 	$(OBJ_DRIVER_SERIAL)
+
 #########################
 ######### arch ###### ###
 #########################
@@ -229,7 +230,6 @@ OBJ_ARCH:=$(BUILD_ARCH)/memcpy.o \
 
 BUILD_DRIVER_SERIAL:=./build/arch/driver/serial
 OBJ_DRIVER_SERIAL:=$(BUILD_DRIVER_SERIAL)/serial.o
-
 
 ifeq ($(ARCH),i386)
 #########################
@@ -258,7 +258,6 @@ serial_clean:
 	rm -rf build/arch/driver/serial
 
 serial: $(OBJ_DRIVER_SERIAL)
-
 
 #########################
 ####### lib std #########

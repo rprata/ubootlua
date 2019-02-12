@@ -1,6 +1,6 @@
 #include <serial.h>
 
-void serial_init(int port, char divisor) {
+void serial_init(word port, byte divisor) {
     // Turn off rs232 interrupt
     outb(port + 1, 0x00);
     // Set DLAB on 
@@ -27,14 +27,18 @@ void serial_init(int port, char divisor) {
     (void)inb(port + 6);    
 }
 
-void serial_putchar(int port, char c) {
+void serial_putchar(word port, char c) {
     // Wait for transmit to be empty
     while (!(inb(port + 5) & 0x20));
     outb(port, c);
 }
 
-void serial_print(int port, const char *s) {
+void serial_print(word port, const char *s) {
     while (*s) {
         serial_putchar(port, *(s)++);
     }
+}
+
+char serial_getchar(word port) {
+    
 }

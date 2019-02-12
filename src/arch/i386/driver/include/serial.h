@@ -23,8 +23,8 @@
 
 #define RS232_BUF_DIM 256 //RS232 buffer size.
  	
-void serial_init(int port, char divisor);
-void serial_putchar(int port, char c);
-void serial_print(int port, const char *s);
+void serial_init(word port, byte divisor);
+void serial_putchar(word port, char c);
+void serial_print(word port, const char *s);
 
 #endif
