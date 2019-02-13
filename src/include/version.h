@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define VERSION "0.0.0"
+#define VERSION "0.1"
 
 #define BANNER_VERSION (" ___________________________________\n" \
 						"/ Hi guys. I'm a modern extensible \\\n" \
@@ -27,7 +27,7 @@ extern "C" {
 						"    -------------|   				 \n" \
 						"        | |    | | 				 \n" \
 						"       <__/    \\__>				 \n" \
-						"(C) 2019 - Version 0.1	    		 \n")
+						"(C) 2019 - Version "VERSION"  		 \n")
 
 #define SZ_BANNER_VERSION 814
 
