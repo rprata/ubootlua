@@ -7,7 +7,7 @@ DEPLOY=./deploy
 BUILD:=./build
 BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
-CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include -Wall -Werror
+CFLAGS:=-Wall -Werror -m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include
 LDFLAGS:=
 export ARCH:=i386
 export ZLIB_SUPPORT:=false
@@ -164,8 +164,12 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDIO) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc \
-		 -L./build/lib/libm -lm \
-		 -static-libgcc -L/usr/lib32 -lgcc
+		 -L./build/lib/libm -lm
+
+ifeq ($(ARCH),i386)
+LDFLAGS+=-static-libgcc -L/usr/lib32 -lgcc
+endif
+
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 CFLAGS+=-I./src/arch/i386/driver/include
