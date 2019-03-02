@@ -6,15 +6,12 @@ extern "C" {
 #endif
 
 #include <types.h>
-#include <ctype.h>
-#include <sizes.h>
-#include <errno.h>
-#include <fifo.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <stdlib.h>
+#include <sizes.h>
+#include <errno.h>
 #include <limits.h>
-#include <string.h>
+#include <fifo.h>
 
 #ifndef EOF
 #define EOF			(-1)
@@ -69,13 +66,17 @@ struct __FILE {
 	int eof, error;
 };
 
-#define stdin		(__runtime_get_stdin())
-#define stdout		(__runtime_get_stdout())
-#define stderr		(__runtime_get_stderr())
+#define stdin		(__stdio_get_stdin())
+#define stdout		(__stdio_get_stdout())
+#define stderr		(__stdio_get_stderr())
 
 FILE * fopen(const char * path, const char * mode);
 FILE * freopen(const char * path, const char * mode, FILE * f);
 int fclose(FILE * f);
+
+int remove(const char * path);
+int rename(const char * old, const char * new);
+int system(const char * cmd);
 
 int feof(FILE * f);
 int ferror(FILE * f);
@@ -114,7 +115,9 @@ int printf(const char * fmt, ...);
 int scanf(const char * fmt, ...);
 
 int vsnprintf(char * buf, size_t n, const char * fmt, va_list ap);
+int vasprintf(char ** s, const char * fmt, va_list ap);
 int vsscanf(const char * buf, const char * fmt, va_list ap);
+int asprintf(char ** s, const char * fmt, ...);
 int sprintf(char * buf, const char * fmt, ...);
 int snprintf(char * buf, size_t n, const char * fmt, ...);
 int sscanf(const char * buf, const char * fmt, ...);
@@ -130,13 +133,13 @@ ssize_t __stdio_read(FILE * f, unsigned char * buf, size_t size);
 ssize_t __stdio_write(FILE * f, const unsigned char * buf, size_t size);
 
 FILE * __file_alloc(int fd);
-
-FILE * __runtime_get_stdin(void);
-FILE * __runtime_get_stdout(void);
-FILE * __runtime_get_stderr(void);
+FILE * __stdio_get_stdin(void);
+FILE * __stdio_get_stdout(void);
+FILE * __stdio_get_stderr(void);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __STDIO_H__ */
+	

@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 enum flags {
 	FL_ZERO				= 0x01,		/* Zero modifier */
@@ -64,7 +65,7 @@ static size_t format_int(char * q, size_t n, uintmax_t val, enum flags flags,
 	tmpval = val;
 	while (tmpval)
 	{
-		tmpval /= base;
+		tmpval = tmpval / base;
 		ndigits++;
 	}
 

@@ -9,7 +9,7 @@ extern "C" {
 
 #define BANNER_VERSION (" ___________________________________\n" \
 						"/ Hi guys. I'm a modern extensible \\\n" \
-						"\\ bootloader with Lua support.      /\n" \
+						"\\ bootloader with Lua support.     /\n" \
 						" -----------------------------------\n" \
 						"  \\    ____________ 				 \n" \
 						"   \\   |__________|					 \n" \

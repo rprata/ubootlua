@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <serial.h>
-
+#include <math.h>
 int __start() {
 
     do_init_mem_pool();
@@ -20,6 +20,7 @@ int __start() {
 //https://github.com/tifanny-suyavong/hello64 
 
     serial_init(TTYS0, BPS_115200);
-    serial_print(TTYS0, BANNER_VERSION);
+    printf(BANNER_VERSION);
+
     return 0;
 }

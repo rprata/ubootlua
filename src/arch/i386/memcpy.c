@@ -341,4 +341,5 @@ void *memcpy(void *dest, const void *src, size_t count)
     case 7: COPY_SHIFT(7);   break;
 #endif
     }
+    return dest;
 }

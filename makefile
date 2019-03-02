@@ -7,7 +7,7 @@ DEPLOY=./deploy
 BUILD:=./build
 BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
-CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include 
+CFLAGS:=-m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include -Wall -Werror
 LDFLAGS:=
 export ARCH:=i386
 export ZLIB_SUPPORT:=false
@@ -23,7 +23,7 @@ all: $(DEPENDENCIES)
 	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM) 
 	$(CC) $(SRC_C) $(OBJ_NASM) -o $(BIN) $(CFLAGS) -T $(LINKER) $(LDFLAGS)
 run:
-	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none
+	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none -d guest_errors
 
 
 
@@ -140,7 +140,12 @@ OBJ_LIBC_STDLIB:=$(BUILD_LIBC_STDLIB)/abs.o \
 #########################
 BUILD_LIBC_STDIO:=./build/lib/libc/stdio
 OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
-				$(BUILD_LIBC_STDIO)/printf.o
+				$(BUILD_LIBC_STDIO)/printf.o \
+				$(BUILD_LIBC_STDIO)/fputs.o \
+				$(BUILD_LIBC_STDIO)/fflush.o \
+				$(BUILD_LIBC_STDIO)/__stdio_write.o \
+				$(BUILD_LIBC_STDIO)/__stdio_flush.o \
+				$(BUILD_LIBC_STDIO)/__stdio.o
 
 #########################
 ######## malloc #########
@@ -158,7 +163,9 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 
 OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDIO) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
 LIB_LIBC:=./build/lib/libc/libc.a
-LDFLAGS+=-L./build/lib/libc -lc
+LDFLAGS+=-L./build/lib/libc -lc \
+		 -L./build/lib/libm -lm \
+		 -static-libgcc -L/usr/lib32 -lgcc
 ifeq ($(ARCH),i386)
 CFLAGS+=-I./src/arch/i386/include
 CFLAGS+=-I./src/arch/i386/driver/include
@@ -203,12 +210,115 @@ build/lib/libc/exit/%.o: src/lib/libc/exit/%.c
 libc_clean:
 	rm -rf build/lib/libc
 
-libc: arch std $(OBJ_LIBC)
-	ar rcs $(LIB_LIBC) $(OBJ_LIBC) $(OBJ_ARCH) $(OBJ_STD) \
+libc: arch std libm $(OBJ_LIBC)
+	ar rcs $(LIB_LIBC) $(OBJ_ARCH) $(OBJ_STD) $(OBJ_LIBC) \
 	$(OBJ_DRIVER_SERIAL)
 
+
 #########################
-######### arch ###### ###
+######### libm  #########
+#########################
+LIB_LIBM:=./build/lib/libm/libm.a
+BUILD_LIBM:=./build/lib/libm
+OBJ_LIBM:=$(BUILD_LIBM)/truncf.o \
+		  $(BUILD_LIBM)/trunc.o \
+		  $(BUILD_LIBM)/tanhf.o \
+		  $(BUILD_LIBM)/tanh.o \
+		  $(BUILD_LIBM)/tanf.o \
+		  $(BUILD_LIBM)/tan.o \
+		  $(BUILD_LIBM)/sqrtf.o \
+		  $(BUILD_LIBM)/sqrt.o \
+		  $(BUILD_LIBM)/sinhf.o \
+		  $(BUILD_LIBM)/sinh.o \
+		  $(BUILD_LIBM)/sinf.o \
+		  $(BUILD_LIBM)/sin.o \
+		  $(BUILD_LIBM)/scalbnf.o \
+		  $(BUILD_LIBM)/scalbn.o \
+		  $(BUILD_LIBM)/scalblnf.o \
+		  $(BUILD_LIBM)/scalbln.o \
+		  $(BUILD_LIBM)/roundf.o \
+		  $(BUILD_LIBM)/round.o \
+		  $(BUILD_LIBM)/rintf.o \
+		  $(BUILD_LIBM)/rint.o \
+		  $(BUILD_LIBM)/powf.o \
+		  $(BUILD_LIBM)/pow.o \
+		  $(BUILD_LIBM)/modf.o \
+		  $(BUILD_LIBM)/modff.o \
+		  $(BUILD_LIBM)/logf.o \
+		  $(BUILD_LIBM)/log2f.o \
+		  $(BUILD_LIBM)/log2.o \
+		  $(BUILD_LIBM)/log1pf.o \
+		  $(BUILD_LIBM)/log1p.o \
+		  $(BUILD_LIBM)/log10f.o \
+		  $(BUILD_LIBM)/log10.o \
+		  $(BUILD_LIBM)/ldexp.o \
+		  $(BUILD_LIBM)/ldexpf.o \
+		  $(BUILD_LIBM)/hypotf.o \
+		  $(BUILD_LIBM)/hypot.o \
+		  $(BUILD_LIBM)/frexpf.o \
+		  $(BUILD_LIBM)/frexp.o \
+		  $(BUILD_LIBM)/fmodf.o \
+		  $(BUILD_LIBM)/fmod.o \
+		  $(BUILD_LIBM)/floorf.o \
+		  $(BUILD_LIBM)/fdimf.o \
+		  $(BUILD_LIBM)/fdim.o \
+		  $(BUILD_LIBM)/fabsf.o \
+		  $(BUILD_LIBM)/fabs.o \
+		  $(BUILD_LIBM)/expm1f.o \
+		  $(BUILD_LIBM)/expm1.o \
+		  $(BUILD_LIBM)/expf.o \
+		  $(BUILD_LIBM)/exp2f.o \
+		  $(BUILD_LIBM)/exp2.o \
+		  $(BUILD_LIBM)/exp.o \
+		  $(BUILD_LIBM)/coshf.o \
+		  $(BUILD_LIBM)/cosh.o \
+		  $(BUILD_LIBM)/cosf.o \
+		  $(BUILD_LIBM)/cos.o \
+		  $(BUILD_LIBM)/ceilf.o \
+		  $(BUILD_LIBM)/ceil.o \
+		  $(BUILD_LIBM)/cbrtf.o \
+		  $(BUILD_LIBM)/cbrt.o \
+		  $(BUILD_LIBM)/atanhf.o \
+		  $(BUILD_LIBM)/atanh.o \
+		  $(BUILD_LIBM)/atanf.o \
+		  $(BUILD_LIBM)/atan2f.o \
+		  $(BUILD_LIBM)/atan2.o \
+		  $(BUILD_LIBM)/atan.o \
+		  $(BUILD_LIBM)/asinhf.o \
+		  $(BUILD_LIBM)/asinhf.o\
+		  $(BUILD_LIBM)/asinf.o \
+		  $(BUILD_LIBM)/asin.o \
+		  $(BUILD_LIBM)/acoshf.o \
+		  $(BUILD_LIBM)/acosh.o \
+		  $(BUILD_LIBM)/acosf.o \
+		  $(BUILD_LIBM)/acos.o \
+		  $(BUILD_LIBM)/__cos.o \
+		  $(BUILD_LIBM)/__cosdf.o \
+		  $(BUILD_LIBM)/__expo2.o \
+		  $(BUILD_LIBM)/__expo2f.o \
+		  $(BUILD_LIBM)/__fpclassify.o \
+		  $(BUILD_LIBM)/__fpclassifyf.o \
+		  $(BUILD_LIBM)/__rem_pio2.o \
+		  $(BUILD_LIBM)/__rem_pio2f.o \
+		  $(BUILD_LIBM)/__rem_pio2_large.o \
+		  $(BUILD_LIBM)/__sin.o \
+		  $(BUILD_LIBM)/__sindf.o \
+		  $(BUILD_LIBM)/__tan.o \
+		  $(BUILD_LIBM)/__tandf.o
+
+build/lib/libm/%.o: src/lib/libm/%.c
+	mkdir -p build/lib/libm 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+libm_clean:
+	rm -rf build/lib/libm
+
+libm: $(OBJ_LIBM)
+	ar rcs $(LIB_LIBM) $(OBJ_LIBM)
+
+
+#########################
+######### arch ##########
 #########################
 
 BUILD_ARCH:=./build/arch
