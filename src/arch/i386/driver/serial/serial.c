@@ -33,6 +33,11 @@ void serial_putchar(word port, char c) {
     outb(port, c);
 }
 
+char serial_getchar(word port) {
+   while((inb(port + 5) & 1) == 0);
+   return inb(port);
+}
+
 void serial_print(word port, const char *s) {
     while (*s) {
         serial_putchar(port, *(s)++);

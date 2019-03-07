@@ -27,5 +27,6 @@ void serial_init(word port, byte divisor);
 void serial_putchar(word port, char c);
 void serial_print(word port, const char *s);
 void serial_println(word port, const char *s);
+char serial_getchar(word port);
 
 #endif

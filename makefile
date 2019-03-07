@@ -23,7 +23,7 @@ all: $(DEPENDENCIES)
 	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM) 
 	$(CC) $(SRC_C) $(OBJ_NASM) -o $(BIN) $(CFLAGS) -T $(LINKER) $(LDFLAGS)
 run:
-	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none -d guest_errors
+	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none
 
 
 
