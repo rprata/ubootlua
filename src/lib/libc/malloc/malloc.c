@@ -787,7 +787,7 @@ void mm_free(void * mm, void * ptr)
 
 void * malloc(size_t size)
 {
-	return NULL;//tlsf_malloc(__heap_pool, size);
+	return tlsf_malloc(__heap_pool, size);
 }
 
 void * memalign(size_t align, size_t size)

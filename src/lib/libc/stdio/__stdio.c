@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <console.h>
 
 static FILE * __stdin = NULL;
 static FILE * __stdout = NULL;
@@ -7,17 +8,17 @@ static FILE * __stderr = NULL;
 
 static ssize_t __tty_stdin_read(FILE * f, unsigned char * buf, size_t size)
 {
-	return 0;
+	return read_console_driver(buf);
 }
 
 static ssize_t __tty_stdout_write(FILE * f, const unsigned char * buf, size_t size)
 {
-	return 0;
+	return write_console_driver((void *) buf);
 }
 
 static ssize_t __tty_stderr_write(FILE * f, const unsigned char * buf, size_t size)
 {
-	return 0;
+	return write_console_driver((void *) buf);
 }
 
 static ssize_t __tty_null_read(FILE * f, unsigned char * buf, size_t size)
@@ -67,7 +68,8 @@ FILE * __file_alloc(int fd)
 {
 	FILE * f;
 
-	f = malloc(sizeof(FILE));
+	f = (FILE *) malloc(sizeof(struct __FILE));
+
 	if(!f)
 		return 0;
 

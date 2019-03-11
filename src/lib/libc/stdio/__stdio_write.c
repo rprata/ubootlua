@@ -1,6 +1,5 @@
 #include <malloc.h>
 #include <stdio.h>
-#include <serial.h>
 
 static ssize_t __unbuffered_write(FILE * f, const unsigned char * buf, size_t size)
 {
@@ -143,7 +142,6 @@ ssize_t __stdio_write(FILE * f, const unsigned char * buf, size_t size)
 		break;
 	}
 	}
-    serial_print(TTYS0, (char *) buf);
 
 	return cnt;
 }

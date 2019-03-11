@@ -1,7 +1,7 @@
 NASM:=nasm
 CC:=gcc
 SRC_NASM:=./src/init/boot.asm
-SRC_C:=./src/init/boot.c ./src/init/version.c
+SRC_C:=./src/init/boot.c ./src/init/init.c ./src/init/version.c
 LINKER:=./src/init/linker.ld
 DEPLOY=./deploy
 BUILD:=./build
@@ -140,6 +140,7 @@ OBJ_LIBC_STDLIB:=$(BUILD_LIBC_STDLIB)/abs.o \
 #########################
 BUILD_LIBC_STDIO:=./build/lib/libc/stdio
 OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
+				$(BUILD_LIBC_STDIO)/fprintf.o \
 				$(BUILD_LIBC_STDIO)/printf.o \
 				$(BUILD_LIBC_STDIO)/fputs.o \
 				$(BUILD_LIBC_STDIO)/fflush.o \
@@ -216,7 +217,8 @@ libc_clean:
 
 libc: arch std libm $(OBJ_LIBC)
 	ar rcs $(LIB_LIBC) $(OBJ_ARCH) $(OBJ_STD) $(OBJ_LIBC) \
-	$(OBJ_DRIVER_SERIAL)
+	$(OBJ_DRIVER_SERIAL) \
+	$(OBJ_DRIVER_CONSOLE)
 
 
 #########################
@@ -345,6 +347,13 @@ OBJ_ARCH:=$(BUILD_ARCH)/memcpy.o \
 BUILD_DRIVER_SERIAL:=./build/arch/driver/serial
 OBJ_DRIVER_SERIAL:=$(BUILD_DRIVER_SERIAL)/serial.o
 
+#########################
+######## console ########
+#########################
+
+BUILD_DRIVER_CONSOLE:=./build/arch/driver/console
+OBJ_DRIVER_CONSOLE:=$(BUILD_DRIVER_CONSOLE)/console.o
+
 ifeq ($(ARCH),i386)
 #########################
 ######### i386 ##########
@@ -361,17 +370,26 @@ build/arch/driver/serial/%.o: src/arch/i386/driver/serial/%.c
 	mkdir -p build/arch/driver/serial 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+build/arch/driver/console/%.o: src/arch/i386/driver/console/%.c
+	mkdir -p build/arch/driver/console 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
 endif
 
 arch_clean:
 	rm -rf build/arch
 
-arch: serial $(OBJ_ARCH)
+arch: serial console $(OBJ_ARCH)
 
 serial_clean:
 	rm -rf build/arch/driver/serial
 
 serial: $(OBJ_DRIVER_SERIAL)
+
+console_clean:
+	rm -rf build/arch/driver/console
+
+console: $(OBJ_DRIVER_CONSOLE)
 
 #########################
 ####### lib std #########
