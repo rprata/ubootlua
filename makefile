@@ -141,9 +141,12 @@ OBJ_LIBC_STDLIB:=$(BUILD_LIBC_STDLIB)/abs.o \
 BUILD_LIBC_STDIO:=./build/lib/libc/stdio
 OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
 				$(BUILD_LIBC_STDIO)/fprintf.o \
+				$(BUILD_LIBC_STDIO)/vasprintf.o \
+				$(BUILD_LIBC_STDIO)/asprintf.o \
 				$(BUILD_LIBC_STDIO)/printf.o \
 				$(BUILD_LIBC_STDIO)/fputs.o \
 				$(BUILD_LIBC_STDIO)/fflush.o \
+				$(BUILD_LIBC_STDIO)/__stdio_read.o \
 				$(BUILD_LIBC_STDIO)/__stdio_write.o \
 				$(BUILD_LIBC_STDIO)/__stdio_flush.o \
 				$(BUILD_LIBC_STDIO)/__stdio.o
