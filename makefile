@@ -145,11 +145,21 @@ OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
 				$(BUILD_LIBC_STDIO)/asprintf.o \
 				$(BUILD_LIBC_STDIO)/printf.o \
 				$(BUILD_LIBC_STDIO)/fputs.o \
-				$(BUILD_LIBC_STDIO)/fflush.o \
+				$(BUILD_LIBC_STDIO)/fclose.o \
+				$(BUILD_LIBC_STDIO)/feof.o \
+				$(BUILD_LIBC_STDIO)/ferror.o \
+				$(BUILD_LIBC_STDIO)/fgetc.o \
+				$(BUILD_LIBC_STDIO)/fgets.o \
+				$(BUILD_LIBC_STDIO)/fgetpos.o \
+				$(BUILD_LIBC_STDIO)/clearerr.o \
 				$(BUILD_LIBC_STDIO)/__stdio_read.o \
 				$(BUILD_LIBC_STDIO)/__stdio_write.o \
 				$(BUILD_LIBC_STDIO)/__stdio_flush.o \
 				$(BUILD_LIBC_STDIO)/__stdio.o
+
+				# need to create a virtual file system
+				# $(BUILD_LIBC_STDIO)/fopen.o
+
 
 #########################
 ######## malloc #########
