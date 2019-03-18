@@ -152,6 +152,7 @@ OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
 				$(BUILD_LIBC_STDIO)/fgets.o \
 				$(BUILD_LIBC_STDIO)/fgetpos.o \
 				$(BUILD_LIBC_STDIO)/clearerr.o \
+				$(BUILD_LIBC_STDIO)/fflush.o \
 				$(BUILD_LIBC_STDIO)/__stdio_read.o \
 				$(BUILD_LIBC_STDIO)/__stdio_write.o \
 				$(BUILD_LIBC_STDIO)/__stdio_flush.o \
