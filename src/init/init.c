@@ -1,7 +1,11 @@
 #include <init.h>
+#include <clockevent/clockevent.h>
+#include <clocksource/clocksource.h>
 
-const char * driver_list[1] = {
-	"console"
+const char * driver_list[3] = {
+	"console",
+	"clockevent",
+	"clocksource"
 };
 
 void register_drivers() {
@@ -10,6 +14,13 @@ void register_drivers() {
 		if (strcmp(driver_list[i], "console") == 0) {
 			register_console_driver();
 		}
+		if (strcmp(driver_list[i], "clockevent") == 0) {
+			register_clockevent_driver();
+		}
+		if (strcmp(driver_list[i], "clocksource") == 0) {
+			register_clocksource_driver();
+		}
+
 	}
 }
 
