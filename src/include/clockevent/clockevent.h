@@ -7,7 +7,10 @@ extern "C" {
 
 #include <types.h>
 #include <stddef.h>
+#include <time/timer.h>
 #include <ubootlua/ktime.h>
+#include <ubootlua/seqlock.h>
+#include <ubootlua/kobj.h>
 
 struct clockevent_t
 {
@@ -140,11 +143,17 @@ static inline u64_t clockevent_delta2ns(struct clockevent_t * ce, u64_t latch)
 
 struct clockevent_t * search_clockevent(const char * name);
 struct clockevent_t * search_first_clockevent(void);
-// bool_t register_clockevent(struct device_t ** device, struct clockevent_t * ce);
-// bool_t unregister_clockevent(struct clockevent_t * ce);
+void register_clockevent_driver(struct clockevent_t * ce);
+void unregister_clockevent_driver(struct clockevent_t * ce);
 
 bool_t clockevent_set_event_handler(struct clockevent_t * ce, void (*handler)(struct clockevent_t *, void *), void * data);
 bool_t clockevent_set_event_next(struct clockevent_t * ce, ktime_t now, ktime_t expires);
+
+ssize_t clockevent_read_mult(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clockevent_read_shift(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clockevent_read_frequency(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clockevent_read_min_delta(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clockevent_read_max_delta(struct kobj_t * kobj, void * buf, size_t size);
 
 #ifdef __cplusplus
 }

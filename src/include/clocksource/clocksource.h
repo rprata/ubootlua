@@ -7,11 +7,13 @@ extern "C" {
 
 #include <types.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <time/timer.h>
 
 #include <ubootlua/ktime.h>
 #include <ubootlua/seqlock.h>
-	
+#include <ubootlua/kobj.h>
+
 /*
  * Simplify initialization of mask field
  */
@@ -174,13 +176,17 @@ static inline ktime_t clocksource_keeper_read(struct clocksource_t * cs)
 	return ns_to_ktime(cs->keeper.nsec + offset);
 }
 
-struct clocksource_t * search_clocksource(const char * name);
-struct clocksource_t * search_first_clocksource(void);
-// bool_t register_clocksource(struct device_t ** device, struct clocksource_t * cs);
-// bool_t unregister_clocksource(struct clocksource_t * cs);
+void register_clocksource_driver(struct clocksource_t * cs);
+void unregister_clocksource_driver(struct clocksource_t * cs);
 
 ktime_t clocksource_ktime_get(struct clocksource_t * cs);
 ktime_t ktime_get(void);
+ssize_t clocksource_read_mult(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clocksource_read_shift(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clocksource_read_period(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clocksource_read_deferment(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clocksource_read_cycle(struct kobj_t * kobj, void * buf, size_t size);
+ssize_t clocksource_read_time(struct kobj_t * kobj, void * buf, size_t size);
 
 #ifdef __cplusplus
 }

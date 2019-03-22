@@ -143,6 +143,7 @@ OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
 				$(BUILD_LIBC_STDIO)/fprintf.o \
 				$(BUILD_LIBC_STDIO)/vasprintf.o \
 				$(BUILD_LIBC_STDIO)/asprintf.o \
+				$(BUILD_LIBC_STDIO)/sprintf.o \
 				$(BUILD_LIBC_STDIO)/printf.o \
 				$(BUILD_LIBC_STDIO)/fputs.o \
 				$(BUILD_LIBC_STDIO)/fclose.o \
@@ -253,7 +254,10 @@ libc_clean:
 libc: arch std libm $(OBJ_LIBC)
 	ar rcs $(LIB_LIBC) $(OBJ_ARCH) $(OBJ_STD) $(OBJ_LIBC) \
 	$(OBJ_DRIVER_SERIAL) \
-	$(OBJ_DRIVER_CONSOLE)
+	$(OBJ_DRIVER_CONSOLE) \
+	$(OBJ_DRIVER_TIME) \
+	$(OBJ_DRIVER_CLK_EVT) \
+	$(OBJ_DRIVER_CLK_SRC)
 
 
 #########################
@@ -389,6 +393,29 @@ OBJ_DRIVER_SERIAL:=$(BUILD_DRIVER_SERIAL)/serial.o
 BUILD_DRIVER_CONSOLE:=./build/arch/driver/console
 OBJ_DRIVER_CONSOLE:=$(BUILD_DRIVER_CONSOLE)/console.o
 
+#########################
+######### time ##########
+#########################
+
+BUILD_DRIVER_TIME:=./build/arch/driver/time
+OBJ_DRIVER_TIME:=$(BUILD_DRIVER_TIME)/timer.o
+
+#########################
+######## clock ##########
+######## event ##########
+#########################
+
+BUILD_DRIVER_CLK_EVT:=./build/arch/driver/clockevent
+OBJ_DRIVER_CLK_EVT:=$(BUILD_DRIVER_CLK_EVT)/clockevent.o
+
+#########################
+######## clock ##########
+######## source #########
+#########################
+
+BUILD_DRIVER_CLK_SRC:=./build/arch/driver/clocksource
+OBJ_DRIVER_CLK_SRC:=$(BUILD_DRIVER_CLK_SRC)/clocksource.o
+
 ifeq ($(ARCH),i386)
 #########################
 ######### i386 ##########
@@ -409,12 +436,24 @@ build/arch/driver/console/%.o: src/arch/i386/driver/console/%.c
 	mkdir -p build/arch/driver/console 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+build/arch/driver/time/%.o: src/arch/i386/driver/time/%.c
+	mkdir -p build/arch/driver/time 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+build/arch/driver/clockevent/%.o: src/arch/i386/driver/clockevent/%.c
+	mkdir -p build/arch/driver/clockevent 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+build/arch/driver/clocksource/%.o: src/arch/i386/driver/clocksource/%.c
+	mkdir -p build/arch/driver/clocksource 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
 endif
 
 arch_clean:
 	rm -rf build/arch
 
-arch: serial console $(OBJ_ARCH)
+arch: serial console time clk_evt clk_src $(OBJ_ARCH)
 
 serial_clean:
 	rm -rf build/arch/driver/serial
@@ -425,6 +464,21 @@ console_clean:
 	rm -rf build/arch/driver/console
 
 console: $(OBJ_DRIVER_CONSOLE)
+
+time_clean:
+	rm -rf build/arch/driver/time
+
+time: $(OBJ_DRIVER_TIME)
+
+clk_evt_clean:
+	rm -rf build/arch/driver/clockevent
+
+clk_evt: $(OBJ_DRIVER_CLK_EVT)
+
+clk_src_clean:
+	rm -rf build/arch/driver/clocksource
+
+clk_src: $(OBJ_DRIVER_CLK_SRC)
 
 #########################
 ####### lib std #########
