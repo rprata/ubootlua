@@ -176,8 +176,8 @@ OBJ_LIBC_TIME:=$(BUILD_LIBC_TIME)/asctime.o \
    			   $(BUILD_LIBC_TIME)/strftime.o \
    			   $(BUILD_LIBC_TIME)/time.o \
    			   $(BUILD_LIBC_TIME)/__time_to_tm.o \
-   			   $(BUILD_LIBC_TIME)/__tm_to_time.o
-   			   # $(BUILD_LIBC_TIME)/gettimeofday.o 
+   			   $(BUILD_LIBC_TIME)/__tm_to_time.o \
+   			   $(BUILD_LIBC_TIME)/gettimeofday.o 
 
 #########################
 ######## malloc #########
