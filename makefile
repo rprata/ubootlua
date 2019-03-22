@@ -163,6 +163,23 @@ OBJ_LIBC_STDIO:=$(BUILD_LIBC_STDIO)/vsnprintf.o \
 
 
 #########################
+######### time ##########
+#########################
+BUILD_LIBC_TIME:=./build/lib/libc/time
+OBJ_LIBC_TIME:=$(BUILD_LIBC_TIME)/asctime.o \
+			   $(BUILD_LIBC_TIME)/clock.o \
+  			   $(BUILD_LIBC_TIME)/ctime.o \
+  			   $(BUILD_LIBC_TIME)/difftime.o \
+   			   $(BUILD_LIBC_TIME)/gmtime.o \
+   			   $(BUILD_LIBC_TIME)/localtime.o \
+   			   $(BUILD_LIBC_TIME)/mktime.o \
+   			   $(BUILD_LIBC_TIME)/strftime.o \
+   			   $(BUILD_LIBC_TIME)/time.o \
+   			   $(BUILD_LIBC_TIME)/__time_to_tm.o \
+   			   $(BUILD_LIBC_TIME)/__tm_to_time.o
+   			   # $(BUILD_LIBC_TIME)/gettimeofday.o 
+
+#########################
 ######## malloc #########
 #########################
 BUILD_LIBC_MALLOC:=./build/lib/libc/malloc
@@ -176,7 +193,7 @@ OBJ_LIBC_EXIT:=$(BUILD_LIBC_EXIT)/assert.o \
 			   $(BUILD_LIBC_EXIT)/abort.o \
 			   $(BUILD_LIBC_EXIT)/exit.o
 
-OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDIO) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
+OBJ_LIBC:=$(OBJ_LIBC_EXIT) $(OBJ_LIBC_MALLOC) $(OBJ_LIBC_STDIO) $(OBJ_LIBC_STDLIB) $(OBJ_LIBC_TIME) $(OBJ_LIBC_CHARSET) $(OBJ_LIBC_CRYPTO) $(OBJ_LIBC_CTYPE) $(OBJ_LIBC_STRING) $(OBJ_LIBC_ERRNO)
 LIB_LIBC:=./build/lib/libc/libc.a
 LDFLAGS+=-L./build/lib/libc -lc \
 		 -L./build/lib/libm -lm
@@ -208,6 +225,10 @@ build/lib/libc/crypto/%.o: src/lib/libc/crypto/%.c
 
 build/lib/libc/charset/%.o: src/lib/libc/charset/%.c
 	mkdir -p build/lib/libc/charset 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+build/lib/libc/time/%.o: src/lib/libc/time/%.c
+	mkdir -p build/lib/libc/time 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 build/lib/libc/stdio/%.o: src/lib/libc/stdio/%.c
