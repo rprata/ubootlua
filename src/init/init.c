@@ -15,10 +15,10 @@ void register_drivers() {
 			register_console_driver();
 		}
 		if (strcmp(driver_list[i], "clockevent") == 0) {
-			register_clockevent_driver();
+			register_clockevent_driver(NULL);
 		}
 		if (strcmp(driver_list[i], "clocksource") == 0) {
-			register_clocksource_driver();
+			register_clocksource_driver(NULL);
 		}
 
 	}
