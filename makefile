@@ -9,6 +9,10 @@ BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
 CFLAGS:=-Wall -Werror -m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include
 LDFLAGS:=
+OC:=objcopy
+DD:=dd
+ELF:=$(DEPLOY)/boot.elf
+
 export ARCH:=i386
 export ZLIB_SUPPORT:=false
 
@@ -20,8 +24,12 @@ endif
 all: $(DEPENDENCIES)
 	mkdir -p $(DEPLOY)
 	mkdir -p $(BUILD)
-	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM) 
-	$(CC) $(SRC_C) $(OBJ_NASM) -o $(BIN) $(CFLAGS) -T $(LINKER) $(LDFLAGS)
+	$(NASM) $(SRC_NASM) -f elf32 -o $(OBJ_NASM)
+	$(CC) $(SRC_C) $(OBJ_NASM) -o $(ELF) $(CFLAGS) -T $(LINKER) $(LDFLAGS)
+	$(OC) -O binary $(ELF) $(BIN)
+	$(DD) if=/dev/zero of=$(BIN).tmp count=1440 bs=1024
+	$(DD) if=$(BIN) of=$(BIN).tmp conv=notrunc
+	mv $(BIN).tmp $(BIN)
 run:
 	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none
 
