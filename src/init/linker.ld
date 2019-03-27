@@ -7,9 +7,11 @@ SECTIONS {
     }
     /* Place kernel right after boot sector on disk but set the
      * VMA (ORiGin point) to 0x8000 */
-    .text 0x8000 : AT(0x7e00)
+    . = 0x8000;
+    __kernel_start = .;
+    __kernel_start_seg = __kernel_start >> 4;
+    .text : AT(0x7e00)
     {
-        __kernel_start = .;
         *(.text.start)
         *(.text*)
     }
@@ -21,8 +23,8 @@ SECTIONS {
     {
         *(.data)
     }
-    __kernel_end = .;
     /* Compute number of sectors that the kernel uses */
+    __kernel_end = .;
     __kernel_size = (__kernel_end - __kernel_start + 511) / 512;
 
     .bss :

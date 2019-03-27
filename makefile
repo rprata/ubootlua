@@ -8,7 +8,7 @@ BUILD:=./build
 BIN:=$(DEPLOY)/boot.bin
 OBJ_NASM:=$(BUILD)/boot.o
 CFLAGS:=-Wall -Werror -m32 -fno-pie -ffreestanding -mno-red-zone -fno-exceptions -nostdlib -I./src/include
-LDFLAGS:=
+LDFLAGS:=-Wl,--build-id=none
 OC:=objcopy
 DD:=dd
 ELF:=$(DEPLOY)/boot.elf

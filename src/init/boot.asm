@@ -105,8 +105,8 @@ boot32:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    ;mov esi, msg        ; SI now points to our message
-    ;mov ebx, 0xb8000    ; vga memory position (0)
+    mov esi, msg        ; SI now points to our message
+    mov ebx, 0xb8000    ; vga memory position (0)
 
 .loop:
     lodsb               ; Loads SI into AL and increments SI [next char]
