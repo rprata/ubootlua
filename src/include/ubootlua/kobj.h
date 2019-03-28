@@ -11,7 +11,9 @@ extern "C" {
 #include <atomic.h>
 #include <irqflags.h>
 #include <spinlock.h>
-
+#include <malloc.h>
+#include <string.h>	
+	
 enum kobj_type_t {
 	KOBJ_TYPE_DIR,
 	KOBJ_TYPE_REG,

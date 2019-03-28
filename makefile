@@ -15,8 +15,16 @@ ELF:=$(DEPLOY)/boot.elf
 
 export ARCH:=i386
 export ZLIB_SUPPORT:=false
+export KERNEL_SUPPORT:=false
 
 DEPENDENCIES:=libc
+
+	
+ifeq ($(KERNEL_SUPPORT),true)
+DEPENDENCIES:=$(DEPENDENCIES) kernel
+endif
+
+	
 ifeq ($(ZLIB_SUPPORT),true)
 DEPENDENCIES:=$(DEPENDENCIES) zlib
 endif
@@ -34,6 +42,42 @@ run:
 	qemu-system-i386 -fda $(BIN) -nographic -serial stdio -monitor none
 
 
+
+
+#########################
+######## kernel #########
+#########################
+
+#########################
+######### core ##########
+#########################
+BUILD_KERNEL_CORE:=./build/kernel/core
+OBJ_KERNEL_CORE:=$(BUILD_KERNEL_CORE)/kobj.o \
+				 $(BUILD_KERNEL_CORE)/initcall.o \
+				 $(BUILD_KERNEL_CORE)/task.o \
+				 $(BUILD_KERNEL_CORE)/mutex.o
+
+#########################
+######### vfs ##########
+#########################
+BUILD_KERNEL_VFS:=./build/kernel/vfs
+OBJ_KERNEL_VFS:=$(BUILD_KERNEL_VFS)/vfs.o
+
+OBJ_KERNEL:=$(OBJ_KERNEL_CORE) $(OBJ_KERNEL_VFS)
+
+build/kernel/core/%.o: src/kernel/core/%.c
+	mkdir -p build/kernel/core
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+build/kernel/vfs/%.o: src/kernel/vfs/%.c
+	mkdir -p build/kernel/vfs
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+kernel_clean:
+	rm -rf ./build/kernel/
+
+kernel: $(OBJ_KERNEL) libc
+	$(CC) -c -o $@ $< $(CFLAGS)
 
 #########################
 ######### libc ##########

@@ -1,98 +1,76 @@
 #ifndef __ATOMIC_H__
 #define __ATOMIC_H__
 
-#include <compiler.h>
-#include <types.h>
-
-//! \brief Initialize an atomic variable.
-#define atomic_init(i)		{ (i) }
-
-//! \brief Set the atomic value of v to i (guaranteed only for 24 bits)
-#define atomic_set(v, i)	(((v)->counter) = (i))
-
-//! \brief Read the atomic value of v (guaranteed only for 24 bits)
-#define atomic_read(v)		((v)->counter)
-
-//! \brief Perform an atomic increment.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ void atomic_inc(atomic_t *v)
-{
-	__asm__ __volatile__(
-		"lock ; incl %0"
-		: "=m"(v->counter) : "m"(v->counter));
-}
-
-//! \brief Perform an atomic decrement.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ void atomic_dec(atomic_t *v)
-{
-	__asm__ __volatile__(
-		"lock ; decl %0"
-		: "=m"(v->counter) : "m"(v->counter));
-}
-
-//! Add an integer to the atomic variable v.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ void atomic_add( int i, atomic_t *v )
-{
-	__asm__ __volatile__(
-		"lock ; addl %1, %0"
-		: "=m"(v->counter) : "ir"(i), "m"(v->counter));
-}
-
-//! Subtract an integer from the atomic variable v.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ void atomic_sub( int i, atomic_t *v )
-{
-	__asm__ __volatile__(
-		"lock ; subl %1, %0"
-		: "=m"(v->counter) : "ir"(i), "m"(v->counter));
-}
-
-//! Add i to v and returns true if the result is negative, or false when
-//! the result is greater than or equal to zero.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ int atomic_add_negative( int i, atomic_t *v )
-{
-	unsigned char c;
-
-	__asm__ __volatile__(
-		"lock ; addl %2,%0; sets %1"
-		:"=m"(v->counter), "=qm"(c)
-		:"ir"(i), "m"(v->counter) : "memory");
-	return( c );
-}
-
-//! Decrement and test.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ int atomic_dec_and_test(atomic_t *v)
-{
-	unsigned char c;
-
-	__asm__ __volatile__ (
-		"lock\n"
-		"decl %0\n"
-		"sete %1"
-		: "=m"(v->counter), "=qm"(c)
-		: "m"(v->counter)
-		: "memory" );
-	return( c != 0 );
-}
-
-//! Increment and test.
-//! \warning Guaranteed only for 24 bits.
-static __INLINE__ int atomic_inc_and_test(atomic_t *v)
-{
-	unsigned char c;
-
-	__asm__ __volatile__ (
-		"lock\n"
-		"incl %0\n"
-		"sete %1"
-		: "=m"(v->counter), "=qm"(c)
-		: "m"(v->counter)
-		: "memory" );
-	return( c != 0 );
-}
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+#include <types.h>
+#include <barrier.h>
+
+static inline void atomic_add(atomic_t * a, int v)
+{
+	__asm__ __volatile__ (
+		"lock;\n"
+		" addl %k1, %k0\n"
+		:"+m"(a->counter)
+		:"ir"(v));
+}
+
+static inline int atomic_add_return(atomic_t * a, int v)
+{
+	int tmp;
+
+	__asm__ __volatile__ (
+		"lock;\n"
+		" xaddl %k0, %k1\n"
+		:"=r"(tmp),"+m"(a->counter)
+		:"0"(v):"cc");
+
+	return v + tmp;
+}
+
+static inline void atomic_sub(atomic_t * a, int v)
+{
+	__asm__ __volatile__ (
+		"lock;\n"
+		" subl %k1, %k0\n"
+		:"+m"(a->counter)
+		:"ir"(v));
+}
+
+static inline int atomic_sub_return(atomic_t * a, int v)
+{
+	return atomic_add_return(a, -v);
+}
+
+static inline int atomic_cmp_exchange(atomic_t * a, int o, int n)
+{
+	int ret;
+
+	__asm__ __volatile__ (
+		"lock;\n"
+		"cmpxchgl %k2, %k1\n"
+		:"=a"(ret),"+m"(a->counter)
+		:"r"(n), "0"(o)
+		:"memory");
+	return ret;
+}
+
+#define atomic_set(a, v)			do { ((a)->counter) = (v); smp_wmb(); } while(0)
+#define atomic_get(a)				({ int __v; __v = (a)->counter; smp_rmb(); __v; })
+#define atomic_inc(a)				(atomic_add(a, 1))
+#define atomic_dec(a)				(atomic_sub(a, 1))
+#define atomic_inc_return(a)		(atomic_add_return(a, 1))
+#define atomic_dec_return(a)		(atomic_sub_return(a, 1))
+#define atomic_inc_and_test(a)		(atomic_add_return(a, 1) == 0)
+#define atomic_dec_and_test(a)		(atomic_sub_return(a, 1) == 0)
+#define atomic_add_negative(a, v)	(atomic_add_return(a, v) < 0)
+#define atomic_sub_and_test(a, v)	(atomic_sub_return(a, v) == 0)
+#define atomic_cmpxchg(a, o, n)		(atomic_cmp_exchange(a, o, n))
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _ATOMIC_H__ */
