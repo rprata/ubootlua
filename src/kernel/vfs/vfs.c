@@ -454,78 +454,78 @@ static int vfs_node_acquire(const char * path, struct vfs_node_t ** np)
 	return 0;
 }
 
-static void vfs_force_unmount(struct vfs_mount_t * m)
-{
-	struct vfs_mount_t * tm;
-	struct vfs_node_t * n;
-	int found;
-	int i;
+// static void vfs_force_unmount(struct vfs_mount_t * m)
+// {
+// 	struct vfs_mount_t * tm;
+// 	struct vfs_node_t * n;
+// 	int found;
+// 	int i;
 
-	while(1)
-	{
-		found = 0;
-		list_for_each_entry(tm, &mnt_list, m_link)
-		{
-			if(tm->m_covered && tm->m_covered->v_mount == m)
-			{
-				found = 1;
-				break;
-			}
-		}
-		if(!found)
-			break;
-		vfs_force_unmount(tm);
-	}
-	list_del(&m->m_link);
+// 	while(1)
+// 	{
+// 		found = 0;
+// 		list_for_each_entry(tm, &mnt_list, m_link)
+// 		{
+// 			if(tm->m_covered && tm->m_covered->v_mount == m)
+// 			{
+// 				found = 1;
+// 				break;
+// 			}
+// 		}
+// 		if(!found)
+// 			break;
+// 		vfs_force_unmount(tm);
+// 	}
+// 	list_del(&m->m_link);
 
-	mutex_lock(&fd_file_lock);
-	for(i = 0; i < VFS_MAX_FD; i++)
-	{
-		if(fd_file[i].f_node && (fd_file[i].f_node->v_mount == m))
-		{
-			mutex_lock(&fd_file[i].f_lock);
-			fd_file[i].f_node = NULL;
-			fd_file[i].f_offset = 0;
-			fd_file[i].f_flags = 0;
-			mutex_unlock(&fd_file[i].f_lock);
-		}
-	}
-	mutex_unlock(&fd_file_lock);
+// 	mutex_lock(&fd_file_lock);
+// 	for(i = 0; i < VFS_MAX_FD; i++)
+// 	{
+// 		if(fd_file[i].f_node && (fd_file[i].f_node->v_mount == m))
+// 		{
+// 			mutex_lock(&fd_file[i].f_lock);
+// 			fd_file[i].f_node = NULL;
+// 			fd_file[i].f_offset = 0;
+// 			fd_file[i].f_flags = 0;
+// 			mutex_unlock(&fd_file[i].f_lock);
+// 		}
+// 	}
+// 	mutex_unlock(&fd_file_lock);
 
-	for(i = 0; i < VFS_NODE_HASH_SIZE; i++)
-	{
-		mutex_lock(&node_list_lock[i]);
-		while(1)
-		{
-			found = 0;
-			list_for_each_entry(n, &node_list[i], v_link)
-			{
-				if(n->v_mount == m)
-				{
-					found = 1;
-					break;
-				}
-			}
-			if(!found)
-				break;
+// 	for(i = 0; i < VFS_NODE_HASH_SIZE; i++)
+// 	{
+// 		mutex_lock(&node_list_lock[i]);
+// 		while(1)
+// 		{
+// 			found = 0;
+// 			list_for_each_entry(n, &node_list[i], v_link)
+// 			{
+// 				if(n->v_mount == m)
+// 				{
+// 					found = 1;
+// 					break;
+// 				}
+// 			}
+// 			if(!found)
+// 				break;
 
-			list_del(&n->v_link);
-			mutex_lock(&n->v_mount->m_lock);
-			n->v_mount->m_fs->vput(n->v_mount, n);
-			mutex_unlock(&n->v_mount->m_lock);
-			free(n);
-		}
-		mutex_unlock(&node_list_lock[i]);
-	}
+// 			list_del(&n->v_link);
+// 			mutex_lock(&n->v_mount->m_lock);
+// 			n->v_mount->m_fs->vput(n->v_mount, n);
+// 			mutex_unlock(&n->v_mount->m_lock);
+// 			free(n);
+// 		}
+// 		mutex_unlock(&node_list_lock[i]);
+// 	}
 
-	mutex_lock(&m->m_lock);
-	m->m_fs->unmount(m);
-	mutex_unlock(&m->m_lock);
+// 	mutex_lock(&m->m_lock);
+// 	m->m_fs->unmount(m);
+// 	mutex_unlock(&m->m_lock);
 
-	if(m->m_covered)
-		vfs_node_release(m->m_covered);
-	free(m);
-}
+// 	if(m->m_covered)
+// 		vfs_node_release(m->m_covered);
+// 	free(m);
+// }
 
 int vfs_mount(const char * dev, const char * dir, const char * fsname, u32_t flags)
 {

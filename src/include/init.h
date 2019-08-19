@@ -12,6 +12,7 @@ extern "C" {
 #include <string.h>
 #include <assert.h>
 #include <console.h>
+#include <vfs/vfs.h>
 
 void register_drivers(void);
 

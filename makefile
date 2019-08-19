@@ -15,9 +15,9 @@ ELF:=$(DEPLOY)/boot.elf
 
 export ARCH:=i386
 export ZLIB_SUPPORT:=false
-export KERNEL_SUPPORT:=false
+export KERNEL_SUPPORT:=true
 
-DEPENDENCIES:=libc
+DEPENDENCIES:=$(DEPENDENCIES) libc
 
 	
 ifeq ($(KERNEL_SUPPORT),true)
@@ -51,6 +51,9 @@ run:
 #########################
 ######### core ##########
 #########################
+LIB_KERNEL:=./build/kernel/libkernel.a
+LDFLAGS+=-L./build/kernel -lkernel
+
 BUILD_KERNEL_CORE:=./build/kernel/core
 OBJ_KERNEL_CORE:=$(BUILD_KERNEL_CORE)/kobj.o \
 				 $(BUILD_KERNEL_CORE)/initcall.o \
@@ -77,7 +80,7 @@ kernel_clean:
 	rm -rf ./build/kernel/
 
 kernel: $(OBJ_KERNEL) libc
-	$(CC) -c -o $@ $< $(CFLAGS)
+	ar rcs $(LIB_KERNEL) $(OBJ_KERNEL)
 
 #########################
 ######### libc ##########
