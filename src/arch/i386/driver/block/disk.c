@@ -1,7 +1,6 @@
 
-#include <xboot.h>
-#include <block/disk.h>
-#include <block/partition.h>
+#include <disk.h>
+#include <partition.h>
 
 struct disk_block_t
 {
@@ -9,180 +8,60 @@ struct disk_block_t
 	struct disk_t * disk;
 };
 
-static u64_t disk_block_read(struct block_t * blk, u8_t * buf, u64_t blkno, u64_t blkcnt)
-{
-	struct disk_block_t * dblk = (struct disk_block_t *)(blk->priv);
-	struct disk_t * disk = dblk->disk;
-	return (disk->read(disk, buf, blkno + dblk->offset, blkcnt));
-}
+// static u64_t disk_block_read(struct block_t * blk, u8_t * buf, u64_t blkno, u64_t blkcnt)
+// {
+// 	struct disk_block_t * dblk = (struct disk_block_t *)(blk->priv);
+// 	struct disk_t * disk = dblk->disk;
+// 	return (disk->read(disk, buf, blkno + dblk->offset, blkcnt));
+// }
 
-static u64_t disk_block_write(struct block_t * blk, u8_t * buf, u64_t blkno, u64_t blkcnt)
-{
-	struct disk_block_t * dblk = (struct disk_block_t *)(blk->priv);
-	struct disk_t * disk = dblk->disk;
-	return (disk->write(disk, buf, blkno + dblk->offset, blkcnt));
-}
+// static u64_t disk_block_write(struct block_t * blk, u8_t * buf, u64_t blkno, u64_t blkcnt)
+// {
+// 	struct disk_block_t * dblk = (struct disk_block_t *)(blk->priv);
+// 	struct disk_t * disk = dblk->disk;
+// 	return (disk->write(disk, buf, blkno + dblk->offset, blkcnt));
+// }
 
-static void disk_block_sync(struct block_t * blk)
-{
-}
+// static void disk_block_sync(struct block_t * blk)
+// {
+// }
 
-static ssize_t partition_read_from(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct partition_t * part = (struct partition_t *)kobj->priv;
-	return sprintf(buf, "%lld", part->from);
-}
+// static ssize_t partition_read_from(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct partition_t * part = (struct partition_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", part->from);
+// }
 
-static ssize_t partition_read_to(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct partition_t * part = (struct partition_t *)kobj->priv;
-	return sprintf(buf, "%lld", part->to);
-}
+// static ssize_t partition_read_to(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct partition_t * part = (struct partition_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", part->to);
+// }
 
-static ssize_t partition_read_size(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct partition_t * part = (struct partition_t *)kobj->priv;
-	return sprintf(buf, "%lld", part->size);
-}
+// static ssize_t partition_read_size(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct partition_t * part = (struct partition_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", part->size);
+// }
 
-static ssize_t partition_read_capacity(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct partition_t * part = (struct partition_t *)kobj->priv;
-	return sprintf(buf, "%lld", (part->to - part->from + 1) * part->size);
-}
+// static ssize_t partition_read_capacity(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct partition_t * part = (struct partition_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", (part->to - part->from + 1) * part->size);
+// }
 
 struct disk_t * search_disk(const char * name)
 {
-	struct device_t * dev;
-
-	dev = search_device(name, DEVICE_TYPE_DISK);
-	if(!dev)
-		return NULL;
-
-	return (struct disk_t *)dev->priv;
+	return NULL;
 }
 
-bool_t register_disk(struct device_t ** device, struct disk_t * disk)
+bool_t register_disk(struct disk_t * disk)
 {
-	struct device_t * dev;
-	struct kobj_t * kobj;
-	struct partition_t * ppos, * pn;
-	struct block_t * blk;
-	struct disk_block_t * dblk;
-	char name[256];
-
-	if(!disk)
-		return FALSE;
-
-	if(!disk || !disk->name)
-		return FALSE;
-
-	if(!partition_map(disk))
-		return FALSE;
-
-	if(list_empty(&(disk->part.entry)))
-		return FALSE;
-
-	dev = malloc(sizeof(struct device_t));
-	if(!dev)
-		return FALSE;
-
-	dev->name = strdup(disk->name);
-	dev->type = DEVICE_TYPE_DISK;
-	dev->driver = NULL;
-	dev->priv = (void *)disk;
-	dev->kobj = kobj_alloc_directory(dev->name);
-	list_for_each_entry_safe(ppos, pn, &(disk->part.entry), entry)
-	{
-		kobj = kobj_search_directory_with_create(dev->kobj, ppos->name);
-		kobj_add_regular(kobj, "from", partition_read_from, NULL, ppos);
-		kobj_add_regular(kobj, "to", partition_read_to, NULL, ppos);
-		kobj_add_regular(kobj, "size", partition_read_size, NULL, ppos);
-		kobj_add_regular(kobj, "capacity", partition_read_capacity, NULL, ppos);
-	}
-
-	if(!register_device(dev))
-	{
-		kobj_remove_self(dev->kobj);
-		free(dev->name);
-		free(dev);
-		return FALSE;
-	}
-
-	list_for_each_entry_safe(ppos, pn, &(disk->part.entry), entry)
-	{
-		blk = malloc(sizeof(struct block_t));
-		dblk = malloc(sizeof(struct disk_block_t));
-		if(!blk || !dblk)
-		{
-			free(blk);
-			free(dblk);
-			unregister_disk(disk);
-			return FALSE;
-		}
-
-		snprintf(name, sizeof(name), "%s.%s", disk->name, ppos->name);
-
-		ppos->blk = blk;
-		dblk->offset = ppos->from;
-		dblk->disk = disk;
-
-		blk->name = strdup(name);
-		blk->blksz = ppos->size;
-		blk->blkcnt = ppos->to - ppos->from + 1;
-		blk->read = disk_block_read;
-		blk->write = disk_block_write;
-		blk->sync = disk_block_sync;
-		blk->priv = dblk;
-
-		if(!register_block(NULL, blk))
-		{
-			free(blk->name);
-			free(blk);
-			free(dblk);
-			ppos->blk = NULL;
-			unregister_disk(disk);
-			return FALSE;
-		}
-	}
-
-	if(device)
-		*device = dev;
 	return TRUE;
 }
 
 bool_t unregister_disk(struct disk_t * disk)
 {
-	struct device_t * dev;
-	struct partition_t * ppos, * pn;
-	struct block_t * blk;
-
-	if(!disk || !disk->name)
-		return FALSE;
-
-	list_for_each_entry_safe(ppos, pn, &(disk->part.entry), entry)
-	{
-		blk = ppos->blk;
-		if(blk)
-		{
-			unregister_block(blk);
-			free(blk->name);
-			free(blk->priv);
-			free(blk);
-		}
-		free(ppos);
-	}
-
-	dev = search_device(disk->name, DEVICE_TYPE_DISK);
-	if(!dev)
-		return FALSE;
-
-	if(!unregister_device(dev))
-		return FALSE;
-
-	kobj_remove_self(dev->kobj);
-	free(dev->name);
-	free(dev);
 	return TRUE;
 }
 

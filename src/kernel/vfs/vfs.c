@@ -541,15 +541,15 @@ int vfs_mount(const char * dev, const char * dir, const char * fsname, u32_t fla
 	if(!(fs = search_filesystem(fsname)))
 		return -1;
 
-	if(dev != NULL)
-	{
-		if(!(bdev = search_block(dev)))
-			return -1;
-	}
-	else
-	{
+	// if(dev != NULL)
+	// {
+	// 	if(!(bdev = search_block(dev)))
+	// 		return -1;
+	// }
+	// else
+	// {
 		bdev = NULL;
-	}
+	// }
 
 	if(!(m = calloc(1, sizeof(struct vfs_mount_t))))
 		return -1;

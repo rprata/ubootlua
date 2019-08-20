@@ -435,6 +435,14 @@ OBJ_ARCH:=$(BUILD_ARCH)/memcpy.o \
 #########################
 
 #########################
+######## block ##########
+#########################
+
+BUILD_DRIVER_BLOCK:=./build/arch/driver/block
+OBJ_DRIVER_BLOCK:=$(BUILD_DRIVER_BLOCK)/block.o \
+				   $(BUILD_DRIVER_BLOCK)/disk.o
+
+#########################
 ######## serial #########
 #########################
 
@@ -483,6 +491,10 @@ build/arch/%.o: src/arch/i386/%.S
 	mkdir -p build/arch 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+build/arch/driver/block/%.o: src/arch/i386/driver/block/%.c
+	mkdir -p build/arch/driver/block 
+	$(CC) -c -o $@ $< $(CFLAGS)
+
 build/arch/driver/serial/%.o: src/arch/i386/driver/serial/%.c
 	mkdir -p build/arch/driver/serial 
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -508,7 +520,12 @@ endif
 arch_clean:
 	rm -rf build/arch
 
-arch: serial console time clk_evt clk_src $(OBJ_ARCH)
+arch: block serial console time clk_evt clk_src $(OBJ_ARCH)
+
+block_clean:
+	rm -rf build/arch/driver/block
+
+block: $(OBJ_DRIVER_BLOCK)
 
 serial_clean:
 	rm -rf build/arch/driver/serial

@@ -1,84 +1,37 @@
 
-#include <block/block.h>
+#include <ubootlua/kobj.h>
+#include <block.h>
 
-static ssize_t block_read_size(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct block_t * blk = (struct block_t *)kobj->priv;
-	return sprintf(buf, "%lld", block_size(blk));
-}
+// static ssize_t block_read_size(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct block_t * blk = (struct block_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", block_size(blk));
+// }
 
-static ssize_t block_read_count(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct block_t * blk = (struct block_t *)kobj->priv;
-	return sprintf(buf, "%lld", block_count(blk));
-}
+// static ssize_t block_read_count(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct block_t * blk = (struct block_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", block_count(blk));
+// }
 
-static ssize_t block_read_capacity(struct kobj_t * kobj, void * buf, size_t size)
-{
-	struct block_t * blk = (struct block_t *)kobj->priv;
-	return sprintf(buf, "%lld", block_capacity(blk));
-}
+// static ssize_t block_read_capacity(struct kobj_t * kobj, void * buf, size_t size)
+// {
+// 	struct block_t * blk = (struct block_t *)kobj->priv;
+// 	return sprintf(buf, "%lld", block_capacity(blk));
+// }
 
 struct block_t * search_block(const char * name)
 {
-	struct device_t * dev;
-
-	dev = search_device(name, DEVICE_TYPE_BLOCK);
-	if(!dev)
-		return NULL;
-	return (struct block_t *)dev->priv;
+	return NULL;
 }
 
-bool_t register_block(struct device_t ** device, struct block_t * blk)
+bool_t register_block(struct block_t * blk)
 {
-	struct device_t * dev;
-
-	if(!blk || !blk->name)
-		return FALSE;
-
-	dev = malloc(sizeof(struct device_t));
-	if(!dev)
-		return FALSE;
-
-	dev->name = strdup(blk->name);
-	dev->type = DEVICE_TYPE_BLOCK;
-	dev->driver = NULL;
-	dev->priv = blk;
-	dev->kobj = kobj_alloc_directory(dev->name);
-	kobj_add_regular(dev->kobj, "size", block_read_size, NULL, blk);
-	kobj_add_regular(dev->kobj, "count", block_read_count, NULL, blk);
-	kobj_add_regular(dev->kobj, "capacity", block_read_capacity, NULL, blk);
-
-	if(!register_device(dev))
-	{
-		kobj_remove_self(dev->kobj);
-		free(dev->name);
-		free(dev);
-		return FALSE;
-	}
-
-	if(device)
-		*device = dev;
 	return TRUE;
 }
 
 bool_t unregister_block(struct block_t * blk)
 {
-	struct device_t * dev;
-
-	if(!blk || !blk->name)
-		return FALSE;
-
-	dev = search_device(blk->name, DEVICE_TYPE_BLOCK);
-	if(!dev)
-		return FALSE;
-
-	if(!unregister_device(dev))
-		return FALSE;
-
-	kobj_remove_self(dev->kobj);
-	free(dev->name);
-	free(dev);
 	return TRUE;
 }
 
